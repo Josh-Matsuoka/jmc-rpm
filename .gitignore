@@ -1,0 +1,11 @@
+master.zip
+*-ga.tar.gz
+repository-*.tar.gz
+
+jmc-master
+repository-*
+logs
+
+*.src.rpm
+report.csv
+provides.txt

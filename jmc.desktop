@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=JDK Mission Control
+Comment=Analyze performance of Java applications
+Exec=jmc
+Icon=jmc
+Terminal=false
+Type=Application
+Categories=Development;Java;Profiling;

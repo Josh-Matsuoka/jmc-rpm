@@ -1,0 +1,24 @@
+.TH JMC 1
+.SH NAME
+jmc \- Java profiling and diagnostics tool
+.SH SYNOPSIS
+.B jmc
+[\fB\-vm\fR \fIJVM\fR]
+.SH DESCRIPTION
+JDK Mission Control is a powerful profiler for HotSpot JVMs and has an
+advanced set of tools that enables efficient and detailed analysis of the 
+extensive data collected by JDK Flight Recorder.
+The tool chain enables developers and administrators to collect and analyze data
+from Java applications running locally or deployed in production environments.
+.SH OPTIONS
+.TP
+.BR \-vm \fIJVM\fR
+Specify path to the JVM you wish to use for running JDK Mission Control.
+Defaults to system Java.
+.SH FILES
+.RS
+Startup options are specified here.
+The -vm option can be set here as well to avoid specifying at startup.
+Options specified at startup will override values in this file.
+.SH BUGS
+Report bugs to JMC mailing list: <jmc-dev at openjdk dot java dot net>

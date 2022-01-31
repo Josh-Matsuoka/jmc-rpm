@@ -1,0 +1,389 @@
+diff --git a/application/org.openjdk.jmc.flightrecorder.flameview/pom.xml b/application/org.openjdk.jmc.flightrecorder.flameview/pom.xml
+index d363cba..5bc7c45 100644
+--- a/application/org.openjdk.jmc.flightrecorder.flameview/pom.xml
++++ b/application/org.openjdk.jmc.flightrecorder.flameview/pom.xml
+@@ -42,94 +42,4 @@
+ 	</parent>
+ 	<artifactId>org.openjdk.jmc.flightrecorder.flameview</artifactId>
+ 	<packaging>eclipse-plugin</packaging>
+-
+-	<properties>
+-		<download.maven.plugin.version>1.6.7</download.maven.plugin.version>
+-		<download-maven-plugin.phase>process-resources</download-maven-plugin.phase>
+-		<download-maven-plugin.output>${project.basedir}/src/main/resources/jslibs</download-maven-plugin.output>
+-		<spotless.config.path>${basedir}/../../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path>
+-		<spotless.config.path.js>${basedir}/../../configuration/ide/eclipse/formatting/formattingjs.xml</spotless.config.path.js>
+-	</properties>
+-
+-	<build>
+-		<plugins>
+-			<plugin>
+-				<groupId>com.googlecode.maven-download-plugin</groupId>
+-				<artifactId>download-maven-plugin</artifactId>
+-				<version>${download.maven.plugin.version}</version>
+-				<executions>
+-					<execution>
+-						<id>d3-flamegraph-css</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.css</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>d3-v6-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://d3js.org/d3.v6.min.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>d3-flamegraph-tooltip-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph-tooltip.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>d3-flamegraph-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-						</configuration>
+-					</execution>
+-				</executions>
+-			</plugin>
+-			<!-- The formatter currently dislikes the javascript for some reason, but this is how to enable JavaScript formatting
+-			<plugin>
+-				<groupId>com.diffplug.spotless</groupId>
+-				<artifactId>spotless-maven-plugin</artifactId>
+-				<version>${spotless.version}</version>
+-				<configuration>
+-					<formats>
+-						<format>
+-							<includes>
+-								<include>src/main/js/*.js</include>
+-							</includes>
+-							<eclipseWtp>
+-								<type>JS</type>
+-								<files>
+-									<file>${spotless.config.path.js}</file>
+-								</files>
+-							</eclipseWtp>
+-						</format>
+-					</formats>
+-				</configuration>
+-			</plugin>
+-			-->
+-		</plugins>
+-	</build>
+ </project>
+diff --git a/application/org.openjdk.jmc.flightrecorder.flameview/src/main/java/org/openjdk/jmc/flightrecorder/flameview/views/FlameGraphView.java b/application/org.openjdk.jmc.flightrecorder.flameview/src/main/java/org/openjdk/jmc/flightrecorder/flameview/views/FlameGraphView.java
+index 93cc9a9..0e94a05 100644
+--- a/application/org.openjdk.jmc.flightrecorder.flameview/src/main/java/org/openjdk/jmc/flightrecorder/flameview/views/FlameGraphView.java
++++ b/application/org.openjdk.jmc.flightrecorder.flameview/src/main/java/org/openjdk/jmc/flightrecorder/flameview/views/FlameGraphView.java
+@@ -61,7 +61,6 @@ import java.util.concurrent.Executors;
+ import java.util.concurrent.ThreadFactory;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.logging.Level;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+ import org.eclipse.jface.action.Action;
+@@ -120,27 +119,17 @@ public class FlameGraphView extends ViewPart implements ISelectionListener {
+ 	private static final String TOOLTIP_DESCRIPTION = getFlameviewMessage(FLAMEVIEW_SELECT_HTML_TOOLTIP_DESCRIPTION);
+ 	private static final String HTML_PAGE;
+ 	static {
+-		// from: https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.css
+-		String cssD3Flamegraph = "jslibs/d3-flamegraph.css";
+-		// from: https://d3js.org/d3.v6.min.js
+-		String jsD3V6 = "jslibs/d3.v6.min.js";
+-		// from: https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph-tooltip.js
+-		String jsD3Tip = "jslibs/d3-flamegraph-tooltip.js";
+-		// from: https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.js
+-		String jsD3FlameGraph = "jslibs/d3-flamegraph.js";
+-		// jmc flameview coloring, tooltip and other  functions
+ 		String jsFlameviewName = "flameview.js";
+ 		String cssFlameview = "flameview.css";
+ 
+-		String jsD3 = loadLibraries(jsD3V6, jsD3FlameGraph, jsD3Tip);
+-		String styleheets = loadLibraries(cssD3Flamegraph, cssFlameview);
++		String styleheets = fileContent(cssFlameview);
+ 		String jsFlameviewColoring = fileContent(jsFlameviewName);
+ 
+ 		String magnifierIcon = getIconBase64(ImageConstants.ICON_MAGNIFIER);
+ 
+ 		// formatter arguments for the template: %1 - CSSs stylesheets,
+-		// %2 - Search Icon Base64, %3 - 3rd party scripts, %4 - Flameview Coloring,
+-		HTML_PAGE = String.format(fileContent("page.template"), styleheets, magnifierIcon, jsD3, jsFlameviewColoring);
++		// %2 - Search Icon Base64, %3 - Flameview Coloring,
++		HTML_PAGE = String.format(fileContent("page.template"), styleheets, magnifierIcon, jsFlameviewColoring);
+ 	}
+ 
+ 	private static final int MODEL_EXECUTOR_THREADS_NUMBER = 3;
+@@ -490,14 +479,6 @@ public class FlameGraphView extends ViewPart implements ISelectionListener {
+ 		}
+ 	}
+ 
+-	private static String loadLibraries(String ... libs) {
+-		if (libs == null || libs.length == 0) {
+-			return "";
+-		} else {
+-			return Stream.of(libs).map(FlameGraphView::fileContent).collect(Collectors.joining("\n"));
+-		}
+-	}
+-
+ 	private static String fileContent(String fileName) {
+ 		try {
+ 			return StringToolkit.readString(FlameGraphView.class.getClassLoader().getResourceAsStream(fileName));
+diff --git a/application/org.openjdk.jmc.flightrecorder.flameview/src/main/resources/page.template b/application/org.openjdk.jmc.flightrecorder.flameview/src/main/resources/page.template
+index 67bc3c7..4f0b21c 100644
+--- a/application/org.openjdk.jmc.flightrecorder.flameview/src/main/resources/page.template
++++ b/application/org.openjdk.jmc.flightrecorder.flameview/src/main/resources/page.template
+@@ -3,6 +3,7 @@
+ 
+ <head>
+ 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
++	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.css"></link>
+ 	<style type="text/css">%1$s</style>
+ 	<style type="text/css" media="print">
+ 		body {
+@@ -24,9 +25,9 @@
+ 	<script type="text/javascript">
+ 	%3$s
+ 	</script>
+-	<script type="text/javascript">
+-	%4$s
+-	</script>
++	<script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
++	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.js"></script>
++	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph-tooltip.js"></script>
+ 	<script type="text/javascript">
+ 		
+ 		const minSearchTextSize = 3;
+diff --git a/application/org.openjdk.jmc.flightrecorder.graphview/pom.xml b/application/org.openjdk.jmc.flightrecorder.graphview/pom.xml
+index 93bc736..973677e 100644
+--- a/application/org.openjdk.jmc.flightrecorder.graphview/pom.xml
++++ b/application/org.openjdk.jmc.flightrecorder.graphview/pom.xml
+@@ -42,80 +42,4 @@
+ 	</parent>
+ 	<artifactId>org.openjdk.jmc.flightrecorder.graphview</artifactId>
+ 	<packaging>eclipse-plugin</packaging>
+-
+-	<properties>
+-		<download.maven.plugin.version>1.6.7</download.maven.plugin.version>
+-		<download-maven-plugin.phase>process-resources</download-maven-plugin.phase>
+-		<download-maven-plugin.output>${project.basedir}/src/main/resources/jslibs</download-maven-plugin.output>
+-		<spotless.config.path>${basedir}/../../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path>
+-		<spotless.config.path.js>${basedir}/../../configuration/ide/eclipse/formatting/formattingjs.xml</spotless.config.path.js>
+-	</properties>
+-
+-	<build>
+-		<plugins>
+-			<plugin>
+-				<groupId>com.googlecode.maven-download-plugin</groupId>
+-				<artifactId>download-maven-plugin</artifactId>
+-				<version>${download.maven.plugin.version}</version>
+-				<executions>
+-					<execution>
+-						<id>d3-v5-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://d3js.org/d3.v5.min.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-							<skipCache>true</skipCache>
+-							<overwrite>true</overwrite>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>wasm</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://unpkg.com/@hpcc-js/wasm@0.3.14/dist/index.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-							<skipCache>true</skipCache>
+-							<overwrite>true</overwrite>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>d3-graphviz-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://unpkg.com/d3-graphviz@3.1.0/build/d3-graphviz.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-							<skipCache>true</skipCache>
+-							<overwrite>true</overwrite>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>graphvizlib-wasm</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://unpkg.com/@hpcc-js/wasm@0.3.14/dist/graphvizlib.wasm</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-							<skipCache>true</skipCache>
+-							<overwrite>true</overwrite>
+-						</configuration>
+-					</execution>
+-				</executions>
+-			</plugin>
+-		</plugins>
+-	</build>
+ </project>
+diff --git a/application/org.openjdk.jmc.flightrecorder.graphview/src/main/java/org/openjdk/jmc/flightrecorder/graphview/views/GraphView.java b/application/org.openjdk.jmc.flightrecorder.graphview/src/main/java/org/openjdk/jmc/flightrecorder/graphview/views/GraphView.java
+index 6c55dd2..f30a2c1 100644
+--- a/application/org.openjdk.jmc.flightrecorder.graphview/src/main/java/org/openjdk/jmc/flightrecorder/graphview/views/GraphView.java
++++ b/application/org.openjdk.jmc.flightrecorder.graphview/src/main/java/org/openjdk/jmc/flightrecorder/graphview/views/GraphView.java
+@@ -86,18 +86,7 @@ import org.openjdk.jmc.ui.misc.DisplayToolkit;
+ public class GraphView extends ViewPart implements ISelectionListener {
+ 	private static final String HTML_PAGE;
+ 	static {
+-		String jsD3V5 = "jslibs/d3.v5.min.js";
+-		String jsGraphviz = "jslibs/index.js";
+-		String wasmGraphviz = "jslibs/graphvizlib.wasm";
+-		String jsGraphizD3 = "jslibs/d3-graphviz.js";
+-
+-		String wasmBase64 = loadBase64FromFile(wasmGraphviz);
+-
+-		HTML_PAGE = String.format(loadStringFromFile("page.template"), loadLibraries(jsD3V5),
+-				// we inline base64 wasm in the library code to avoid fetching it at runtime
+-				loadStringFromFile(jsGraphviz, "wasmBinaryFile=\"graphvizlib.wasm\";",
+-						"wasmBinaryFile=dataURIPrefix + '" + wasmBase64 + "';"),
+-				loadLibraries(jsGraphizD3));
++		HTML_PAGE = String.format(loadStringFromFile("page.template"));
+ 	}
+ 
+ 	private enum ModelState {
+diff --git a/application/org.openjdk.jmc.flightrecorder.graphview/src/main/resources/page.template b/application/org.openjdk.jmc.flightrecorder.graphview/src/main/resources/page.template
+index eb7423a..c362f0c 100644
+--- a/application/org.openjdk.jmc.flightrecorder.graphview/src/main/resources/page.template
++++ b/application/org.openjdk.jmc.flightrecorder.graphview/src/main/resources/page.template
+@@ -3,9 +3,10 @@
+ 
+ <head>
+ 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+-	<script>%1$s</script>
+-	<script>%2$s</script>
+-	<script>%3$s</script>
++	<script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
++    <script type="text/javascript" src="https://unpkg.com/@hpcc-js/wasm@0.3.14/dist/index.js"></script>
++    <script type="text/javascript" src="https://unpkg.com/d3-graphviz@3.1.0/build/d3-graphviz.js"></script>
++    <script type="text/javascript" src="https://unpkg.com/@hpcc-js/wasm@0.3.14/dist/graphvizlib.wasm"></script>
+ </head>
+ 
+ <body>
+diff --git a/application/org.openjdk.jmc.flightrecorder.heatmap/pom.xml b/application/org.openjdk.jmc.flightrecorder.heatmap/pom.xml
+index 138ba7f..4f7fe35 100644
+--- a/application/org.openjdk.jmc.flightrecorder.heatmap/pom.xml
++++ b/application/org.openjdk.jmc.flightrecorder.heatmap/pom.xml
+@@ -42,38 +42,4 @@
+ 	</parent>
+ 	<artifactId>org.openjdk.jmc.flightrecorder.heatmap</artifactId>
+ 	<packaging>eclipse-plugin</packaging>
+-
+-	<properties>
+-		<download.maven.plugin.version>1.4.2</download.maven.plugin.version>
+-		<download-maven-plugin.phase>process-resources</download-maven-plugin.phase>
+-		<download-maven-plugin.output>${project.basedir}/src/main/resources/jslibs</download-maven-plugin.output>
+-		<spotless.config.path>${basedir}/../../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path>
+-		<spotless.config.path.js>${basedir}/../../configuration/ide/eclipse/formatting/formattingjs.xml</spotless.config.path.js>
+-	</properties>
+-
+-	<build>
+-		<plugins>
+-			<plugin>
+-				<groupId>com.googlecode.maven-download-plugin</groupId>
+-				<artifactId>download-maven-plugin</artifactId>
+-				<version>${download.maven.plugin.version}</version>
+-				<executions>
+-					<execution>
+-						<id>d3-v6-js</id>
+-						<phase>${download-maven-plugin.phase}</phase>
+-						<goals>
+-							<goal>wget</goal>
+-						</goals>
+-						<configuration>
+-							<url>https://d3js.org/d3.v6.min.js</url>
+-							<unpack>false</unpack>
+-							<outputDirectory>${download-maven-plugin.output}</outputDirectory>
+-							<skipCache>true</skipCache>
+-							<overwrite>true</overwrite>
+-						</configuration>
+-					</execution>
+-				</executions>
+-			</plugin>
+-		</plugins>
+-	</build>
+ </project>
+diff --git a/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/java/org/openjdk/jmc/flightrecorder/heatmap/views/HeatmapView.java b/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/java/org/openjdk/jmc/flightrecorder/heatmap/views/HeatmapView.java
+index 96c19fc..7be0487 100644
+--- a/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/java/org/openjdk/jmc/flightrecorder/heatmap/views/HeatmapView.java
++++ b/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/java/org/openjdk/jmc/flightrecorder/heatmap/views/HeatmapView.java
+@@ -72,9 +72,7 @@ import org.openjdk.jmc.ui.misc.DisplayToolkit;
+ public class HeatmapView extends ViewPart implements ISelectionListener {
+ 	private static final String HTML_PAGE;
+ 	static {
+-		String jsD3V6 = "jslibs/d3.v6.min.js";
+-		HTML_PAGE = String.format(loadStringFromFile("page.template"), loadLibraries(jsD3V6),
+-				loadStringFromFile("heatmap.js"));
++		HTML_PAGE = String.format(loadStringFromFile("page.template"), loadStringFromFile("heatmap.js"));
+ 	}
+ 
+ 	private enum ModelState {
+diff --git a/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/resources/page.template b/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/resources/page.template
+index d6f4c5a..9a13f40 100644
+--- a/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/resources/page.template
++++ b/application/org.openjdk.jmc.flightrecorder.heatmap/src/main/resources/page.template
+@@ -2,15 +2,13 @@
+ <html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+-    <script>
+-      %1$s
+-    </script>
++    <script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
+   </head>
+ 
+   <body>
+     <div id="heatmap" width="100%%" style="text-align: center"></div>
+     <script type="text/javascript">
+-      %2$s
++      %1$s
+     </script>
+   </body>
+ </html>
