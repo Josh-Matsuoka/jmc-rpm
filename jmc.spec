@@ -71,6 +71,7 @@ Provides: bundled(osgi(javax.annotation)) = 1.3.5
 Provides: bundled(osgi(javax.el)) = 2.2.0
 Provides: bundled(osgi(javax.inject)) = 1.0.0
 Provides: bundled(osgi(javax.servlet.jsp)) = 2.2.0
+Provides: bundled(osgi(lz4-java)) = 1.8.0
 Provides: bundled(osgi(org.apache.aries.spifly.dynamic.bundle)) = 1.3.4
 Provides: bundled(osgi(org.apache.batik.constants)) = 1.14.0
 Provides: bundled(osgi(org.apache.batik.css)) = 1.14.0
@@ -414,7 +415,6 @@ Provides: bundled(osgi(org.junit.platform.launcher)) = 1.7.1
 Provides: bundled(osgi(org.junit.platform.runner)) = 1.7.1
 Provides: bundled(osgi(org.junit.platform.suite.api)) = 1.7.1
 Provides: bundled(osgi(org.junit.vintage.engine)) = 5.7.1
-Provides: bundled(osgi(org.lz4.lz4-java)) = 1.8.0
 Provides: bundled(osgi(org.objectweb.asm)) = 9.2.0
 Provides: bundled(osgi(org.objectweb.asm.commons)) = 9.2.0
 Provides: bundled(osgi(org.objectweb.asm.tree)) = 9.2.0
@@ -519,15 +519,15 @@ applications running locally or deployed in production environments.
 # TODO: uncomment me
 # %setup -q -n %{jmc_dir_name}
 # %setup -q -T -D -a 1 -n %{jmc_dir_name}
-# TODO: remove these two lines below
 %setup -q -n jmc-master
 %setup -q -T -D -a 1 -n jmc-master
 
 # Build & install jmc core libraries
-mvn -Dmaven.repo.local=repository-%{major}.%{minor}.%{patchlevel} -o clean install -f core/pom.xml
+mvn -Dmaven.repo.local=repository-%{version} -o clean install -f core/pom.xml
 
 %patch0 -p1
 %patch1 -p1
+# %patch2 -p1
 
 %pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
 %pom_remove_plugin com.github.spotbugs:spotbugs-maven-plugin
@@ -546,7 +546,7 @@ mvn -Dmaven.repo.local=repository-%{major}.%{minor}.%{patchlevel} -o clean insta
 
 # some tests require large heap and fail with OOM
 # depending on the builder resources
-mvn -Dmaven.repo.local=repository-%{major}.%{minor}.%{patchlevel} verify -o -Dmaven.test.failure.ignore=true -DbuildId=rhel -DbuildNumber=%{revhash} -Dbuild.date=%{revdate}
+mvn -Dmaven.repo.local=repository-%{version} verify -o -Dmaven.test.failure.ignore=true -DbuildId=rhel -DbuildNumber=%{revhash} -Dbuild.date=%{revdate}
 
 %install
 
@@ -559,9 +559,13 @@ mvn -Dmaven.repo.local=repository-%{major}.%{minor}.%{patchlevel} verify -o -Dma
 sed -i '/^-vm$/d' %{_builddir}/jmc-master/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/%{name}.ini
 sed -i '/^..\/..\/bin\/$/d' %{_builddir}/jmc-master/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/%{name}.ini
 
+# specify a new location for eclipse config files (at ~/.jmc/${version}/eclipse) so it doesn't interfere with other eclipse installations
+# TODO: uncommint -> sed -i '$ a -Dosgi.configuration.area=@user.home/.%{name}/%{version}/eclipse' %{_builddir}/%{jmc_dir_name}/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/%{name}.ini
+sed -i '$ a -Dosgi.configuration.area=@user.home/.%{name}/%{version}/eclipse' %{_builddir}/jmc-master/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/%{name}.ini
+
 # move contents of target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control' to /usr/lib/jmc/
 install -d -m 755 %{buildroot}%{_jmcdir}
-# TODO: uncomment -> cp -p -r %{_builddir}/%{jmc_dir_name}/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/* %{buildroot}%{_jmcdir}/
+# # TODO: uncomment -> cp -p -r %{_builddir}/%{jmc_dir_name}/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/* %{buildroot}%{_jmcdir}/
 cp -p -r %{_builddir}/jmc-master/target/products/org.openjdk.jmc/linux/gtk/x86_64/'JDK Mission Control'/* %{buildroot}%{_jmcdir}/
 
 # move jmc.ini to /etc/jmc.ini
