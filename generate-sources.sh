@@ -1,19 +1,20 @@
 #!/bin/bash
 
-# temp - remove when 8.2.0 is tagged
+# TODO: remove when 8.2.0 is tagged
 JMC_ROOT=$(dirname "$0")/jmc-master
 JMC_TARBALL=master.zip
 JMC_URL=https://github.com/openjdk/jmc/archive/refs/heads/$JMC_TARBALL
 
-# uncomment when 8.2.0 is tagged
+# TODO: uncomment when 8.2.0 is tagged
 JMC_VERSION=8.2.0
+JMC_REVDATE=20220128
 # JMC_TARBALL=$JMC_VERSION-ga.tar.gz
 # JMC_URL=https://github.com/openjdk/jmc/archive/refs/tags/$JMC_TARBALL
 
 # paths
 DIR=$(dirname "$0")
 LOGS_DIR=$DIR/logs
-M2_DIR=$DIR/repository-$JMC_VERSION
+M2_DIR=$DIR/repository-$JMC_VERSION-$JMC_REVDATE
 # JMC_ROOT=$DIR/jmc-$JMC_VERSION-ga
 JMC_CORE=$JMC_ROOT/core
 JMC_THIRD_PARTY=$JMC_ROOT/releng/third-party
@@ -32,7 +33,7 @@ if [ -f $JMC_TARBALL ]; then
 fi
 
 wget $JMC_URL || { echo $WGET_ERROR; exit 1; };
-# tar -zxvf $JMC_TARBALL
+# TODO: uncomment -> tar -zxvf $JMC_TARBALL
 unzip $JMC_TARBALL
 
 # set up a directory for logs if there isn't already one
@@ -65,7 +66,7 @@ tree $JMC_ROOT/target/products/org.openjdk.jmc/linux/gtk/x86_64/JDK\ Mission\ Co
 python generate-provides.py $LOGS_DIR/plugins.log
 
 # create the zip to be used by the spec file
-tar -czvf repository-$JMC_VERSION.tar.gz $M2_DIR/ report.csv provides.txt
+tar -czvf repository-$JMC_VERSION-$JMC_REVDATE.tar.gz $M2_DIR/ report.csv provides.txt
 
 # if generated, remove maven workspace folder
 if [ -d workspace ]; then

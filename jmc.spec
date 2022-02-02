@@ -5,11 +5,12 @@
 
 # Revision
 %global revnum 1
+# set to 1 for snapshots, 0 for release
+%global usesnapshot 1
 
 # SNAPSHOT version
-%global revhash 14d2f6ca7a404a71c8aa8676cfd301dcab647093
-%global revdate 20211026
-%global releasestr %{revnum}
+%global revhash 9ec05b30c4181c2fba827cfef04da5f9aa96c5d5
+%global revdate 20220128
 
 # TODO: uncomment me
 # %global tarball_name %{major}.%{minor}.%{patchlevel}-ga.tar.gz
@@ -21,6 +22,14 @@
 %global _jmcdir %{_prefix}/lib/%{name}
 
 %global debug_package %{nil}
+
+%if %{usesnapshot}
+  %global releasestr %{revnum}.%{revdate}
+  %global repositorystr repository-%{major}.%{minor}.%{patchlevel}-%{revdate}.tar.gz
+%else
+  %global releasestr %{revnum}
+  %global repositorystr repository-%{major}.%{minor}.%{patchlevel}.tar.gz
+%endif
 
 # Don't export Eclipse libraries
 %global __provides_exclude_from ^%{_jmcdir}/plugins/org.eclipse.*$
@@ -38,7 +47,7 @@ License:    UPL
 URL:        http://openjdk.java.net/projects/jmc/
 
 Source0:    %{tarball_name}
-Source1:    repository-%{major}.%{minor}.%{patchlevel}.tar.gz
+Source1:    %{repositorystr}
 Source2:    %{name}.desktop
 Source3:    %{name}.1
 
@@ -523,11 +532,11 @@ applications running locally or deployed in production environments.
 %setup -q -T -D -a 1 -n jmc-master
 
 # Build & install jmc core libraries
-mvn -Dmaven.repo.local=repository-%{version} -o clean install -f core/pom.xml
+# TODO: uncomment -> mvn -Dmaven.repo.local=repository-%{version} -o clean install -f core/pom.xml
+mvn -Dmaven.repo.local=repository-%{version}-%{revdate} -o clean install -f core/pom.xml
 
 %patch0 -p1
 %patch1 -p1
-# %patch2 -p1
 
 %pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
 %pom_remove_plugin com.github.spotbugs:spotbugs-maven-plugin
@@ -546,7 +555,8 @@ mvn -Dmaven.repo.local=repository-%{version} -o clean install -f core/pom.xml
 
 # some tests require large heap and fail with OOM
 # depending on the builder resources
-mvn -Dmaven.repo.local=repository-%{version} verify -o -Dmaven.test.failure.ignore=true -DbuildId=rhel -DbuildNumber=%{revhash} -Dbuild.date=%{revdate}
+# TODO: uncomment -> mvn -Dmaven.repo.local=repository-%{version} verify -o -Dmaven.test.failure.ignore=true -DbuildId=rhel -DbuildNumber=%{revhash} -Dbuild.date=%{revdate}
+mvn -Dmaven.repo.local=repository-%{version}-%{revdate} verify -o -Dmaven.test.failure.ignore=true -DbuildId=rhel -DbuildNumber=%{revhash} -Dbuild.date=%{revdate}
 
 %install
 
