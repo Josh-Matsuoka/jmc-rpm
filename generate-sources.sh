@@ -63,7 +63,7 @@ python dependency-reporter/jmc_dep_reporter.py $LOGS_DIR/m2-tree.log $LOGS_DIR/p
 
 # generate the tree file for generating the provides that should be added into the spec file
 tree $JMC_ROOT/target/products/org.openjdk.jmc/linux/gtk/x86_64/JDK\ Mission\ Control/ > $LOGS_DIR/plugins.log
-python generate-provides.py $LOGS_DIR/plugins.log
+python dependency-reporter/generate_provides.py $LOGS_DIR/plugins.log
 
 # create the zip to be used by the spec file
 tar -czvf repository-$JMC_VERSION-$JMC_REVDATE.tar.gz $M2_DIR/ report.csv provides.txt

@@ -7,5 +7,5 @@ repository-*
 logs
 
 *.src.rpm
-report.csv
-provides.txt
+/report.csv
+/provides.txt
