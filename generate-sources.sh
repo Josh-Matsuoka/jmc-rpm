@@ -7,7 +7,7 @@ JMC_URL=https://github.com/openjdk/jmc/archive/refs/heads/$JMC_TARBALL
 
 # TODO: uncomment when 8.2.0 is tagged
 JMC_VERSION=8.2.0
-JMC_REVDATE=20220128
+JMC_REVDATE=20220203
 # JMC_TARBALL=$JMC_VERSION-ga.tar.gz
 # JMC_URL=https://github.com/openjdk/jmc/archive/refs/tags/$JMC_TARBALL
 
@@ -52,7 +52,7 @@ jetty_pid=$!;
 mvn clean install $LOCAL_REPO_ARGLINE -f $JMC_CORE/pom.xml > $LOGS_DIR/core.log || { echo $JMC_CORE_BUILD_ERROR; kill $jetty_pid; exit 1; }
 
 # package jmc application to fetch dependencies
-mvn package $LOCAL_REPO_ARGLINE -f $JMC_ROOT/pom.xml > $LOGS_DIR/application.log || { echo $JMC_BUILD_ERROR; kill $jetty_pid; exit 1;}
+mvn clean package $LOCAL_REPO_ARGLINE -f $JMC_ROOT/pom.xml > $LOGS_DIR/application.log || { echo $JMC_BUILD_ERROR; kill $jetty_pid; exit 1;}
 
 # kill the jetty process
 kill $jetty_pid;

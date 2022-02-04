@@ -9,8 +9,8 @@
 %global usesnapshot 1
 
 # SNAPSHOT version
-%global revhash 9ec05b30c4181c2fba827cfef04da5f9aa96c5d5
-%global revdate 20220128
+%global revhash 7f42e4a10291d7e9316711edd81a183951cdae57
+%global revdate 20220203
 
 # TODO: uncomment me
 # %global tarball_name %{major}.%{minor}.%{patchlevel}-ga.tar.gz
