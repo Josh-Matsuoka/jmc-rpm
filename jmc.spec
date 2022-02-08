@@ -57,6 +57,15 @@ Source3:    %{name}.1
 Patch0:     0-inline-javascript-into-templates.patch
 # Remove Windows and Mac environments
 Patch1:     1-remove-non-linux-environments.patch
+# Now that Fedora & related build systems are using JDK 17 by default, this patch
+# prevents the running of the core flightrecorder.writer tests which fail in JDK 17.
+# It fails due to an incapability with mockito, and it's possible that this will be
+# addressed in a future commit to JMC, but is not a priority at the moment.
+# For the time being, skip these tests, and be mindful when generating the local Maven
+# repo that this patch might need to be manually applied as well in order for the
+# core artifacts to install properly.
+# Note: this can be fixed upstream by updating mockito to at least v3.10.0
+Patch2:     2-skip-writer-tests.patch
 
 ExclusiveArch: x86_64
 
@@ -531,12 +540,13 @@ applications running locally or deployed in production environments.
 %setup -q -n jmc-master
 %setup -q -T -D -a 1 -n jmc-master
 
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+
 # Build & install jmc core libraries
 # TODO: uncomment -> mvn -Dmaven.repo.local=repository-%{version} -o clean install -f core/pom.xml
 mvn -Dmaven.repo.local=repository-%{version}-%{revdate} -o clean install -f core/pom.xml
-
-%patch0 -p1
-%patch1 -p1
 
 %pom_remove_plugin org.codehaus.mojo:flatten-maven-plugin
 %pom_remove_plugin com.github.spotbugs:spotbugs-maven-plugin

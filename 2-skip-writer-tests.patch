@@ -1,0 +1,13 @@
+diff --git a/core/tests/pom.xml b/core/tests/pom.xml
+index f19a8ed..1f4db29 100644
+--- a/core/tests/pom.xml
++++ b/core/tests/pom.xml
+@@ -46,7 +46,7 @@
+ 		<module>org.openjdk.jmc.flightrecorder.test</module>
+ 		<module>org.openjdk.jmc.flightrecorder.rules.test</module>
+ 		<module>org.openjdk.jmc.flightrecorder.rules.jdk.test</module>
+-		<module>org.openjdk.jmc.flightrecorder.writer.test</module>
++		<!-- <module>org.openjdk.jmc.flightrecorder.writer.test</module> -->
+ 		<module>org.openjdk.jmc.flightrecorder.serializers.test</module>
+ 		<module>org.openjdk.jmc.jdp.test</module>
+ 	</modules>
