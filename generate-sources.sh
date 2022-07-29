@@ -1,21 +1,21 @@
 #!/bin/bash
 
 # TODO: remove when 8.2.0 is tagged
-JMC_ROOT=$(dirname "$0")/jmc-master
-JMC_TARBALL=master.zip
-JMC_URL=https://github.com/openjdk/jmc/archive/refs/heads/$JMC_TARBALL
+#JMC_ROOT=$(dirname "$0")/jmc-master
+#JMC_TARBALL=master.zip
+#JMC_URL=https://github.com/openjdk/jmc/archive/refs/heads/$JMC_TARBALL
 
 # TODO: uncomment when 8.2.0 is tagged
-JMC_VERSION=8.2.0
-JMC_REVDATE=20220203
-# JMC_TARBALL=$JMC_VERSION-ga.tar.gz
-# JMC_URL=https://github.com/openjdk/jmc/archive/refs/tags/$JMC_TARBALL
+ JMC_VERSION=8.2.0
+ JMC_REVDATE=20220601
+ JMC_TARBALL=$JMC_VERSION-ga.tar.gz
+ JMC_URL=https://github.com/openjdk/jmc/archive/refs/tags/$JMC_TARBALL
 
 # paths
 DIR=$(dirname "$0")
 LOGS_DIR=$DIR/logs
 M2_DIR=$DIR/repository-$JMC_VERSION-$JMC_REVDATE
-# JMC_ROOT=$DIR/jmc-$JMC_VERSION-ga
+JMC_ROOT=$DIR/jmc-$JMC_VERSION-ga
 JMC_CORE=$JMC_ROOT/core
 JMC_THIRD_PARTY=$JMC_ROOT/releng/third-party
 
@@ -34,7 +34,7 @@ fi
 
 wget $JMC_URL || { echo $WGET_ERROR; exit 1; };
 # TODO: uncomment -> tar -zxvf $JMC_TARBALL
-unzip $JMC_TARBALL
+tar -zxvf $JMC_TARBALL
 
 # set up a directory for logs if there isn't already one
 if [ ! -f $LOGS_DIR ]; then
